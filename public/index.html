@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Cổng quản lý tệp NATA bảo mật">
   <title>NATA — Kho dữ liệu</title>
-  <link rel="stylesheet" href="/styles.css?v=20261118-9">
+  <link rel="stylesheet" href="/styles.css?v=20261118-11">
 </head>
 <body>
   <main id="login-view" class="login-shell" hidden>
@@ -46,11 +46,12 @@
     </header>
 
     <section class="workspace">
+      <nav id="breadcrumbs" class="breadcrumbs" aria-label="Đường dẫn thư mục"></nav>
       <header class="workspace-heading">
         <div class="workspace-actions">
           <section class="lot-browser">
             <div class="lot-picker">
-              <span id="lot-browser-title" class="lot-picker-label">Chọn lô</span>
+              <span id="lot-browser-title" class="visually-hidden">Chọn lô</span>
               <button id="lot-trigger" class="lot-trigger" type="button" aria-expanded="false" aria-controls="lot-popup">
                 <span id="lot-trigger-text">— Chọn lô —</span>
                 <span class="lot-chevron" aria-hidden="true">⌄</span>
@@ -65,10 +66,6 @@
                 <p id="lot-no-results" class="lot-no-results" hidden>Không tìm thấy lô phù hợp.</p>
               </div>
             </div>
-            <div id="lot-location" class="lot-location" hidden>
-              <span>Vị trí lô</span>
-              <strong id="lot-location-path"></strong>
-            </div>
           </section>
           <div class="toolbar">
             <label class="search-box">
@@ -81,7 +78,10 @@
           </div>
         </div>
       </header>
-      <nav id="breadcrumbs" class="breadcrumbs" aria-label="Đường dẫn thư mục" hidden></nav>
+      <div id="lot-location" class="lot-location" hidden>
+        <span>Vị trí lô</span>
+        <strong id="lot-location-path"></strong>
+      </div>
 
       <section class="file-panel" aria-labelledby="file-list-title">
         <div class="panel-meta">
@@ -114,6 +114,6 @@
       </div>
     </form>
   </dialog>
-  <script src="/app.js?v=20261118-9" type="module"></script>
+  <script src="/app.js?v=20261118-10" type="module"></script>
 </body>
 </html>
