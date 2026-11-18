@@ -2,6 +2,8 @@
 
 Web quản lý thư mục chia sẻ SMB với đăng nhập, liệt kê, tìm kiếm, tải lên/tải xuống, tạo thư mục, đổi tên và xóa.
 
+Khi trang đang mở, phiên đăng nhập và CSRF token được làm mới tự động mỗi 15 phút. Nếu một thao tác gặp token cũ, trình duyệt lấy token mới và thử lại đúng một lần; token chỉ nằm trong bộ nhớ, không được lưu vào URL hoặc `localStorage`.
+
 Mỗi thư mục có một URL riêng ở dạng `https://.../#/duong-dan-thu-muc`. Có thể sao chép URL để mở lại đúng thư mục sau khi đăng nhập, đồng thời dùng được nút Back/Forward của trình duyệt.
 
 Ô tìm kiếm dùng chung vừa lọc file trong thư mục hiện tại, vừa tìm và chọn các lô có mã `FE-IM`, `FE-EX`, `FR-IM` hoặc `FR-EX`. Khi chọn một lô, trang hiển thị vị trí và toàn bộ tệp trong lô, kể cả tệp nằm trong các thư mục con.

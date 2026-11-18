@@ -10,6 +10,10 @@ const state = {
   username: null,
 };
 
+const SESSION_REFRESH_INTERVAL_MS = 15 * 60 * 1000;
+let sessionRefreshTimer = null;
+let sessionRefreshPromise = null;
+
 const $ = (selector) => document.querySelector(selector);
 const loginView = $('#login-view');
 const appView = $('#app-view');
@@ -20,10 +24,40 @@ const emptyState = $('#empty-state');
 const notice = $('#notice');
 const dialog = $('#name-dialog');
 
-async function api(url, options = {}) {
+async function refreshSession() {
+  if (!sessionRefreshPromise) {
+    sessionRefreshPromise = (async () => {
+      const response = await fetch('/api/session/refresh', { method: 'POST' });
+      if (response.status === 401) {
+        showLogin();
+        throw new Error('Phiên đăng nhập đã hết hạn.');
+      }
+      if (!response.ok) throw new Error('Không thể làm mới phiên đăng nhập.');
+      const session = await response.json();
+      state.csrfToken = session.csrfToken;
+      return session;
+    })().finally(() => { sessionRefreshPromise = null; });
+  }
+  return sessionRefreshPromise;
+}
+
+function stopSessionRefresh() {
+  window.clearInterval(sessionRefreshTimer);
+  sessionRefreshTimer = null;
+}
+
+function startSessionRefresh() {
+  stopSessionRefresh();
+  sessionRefreshTimer = window.setInterval(() => {
+    if (!document.hidden && state.csrfToken) refreshSession().catch(() => {});
+  }, SESSION_REFRESH_INTERVAL_MS);
+}
+
+async function api(url, options = {}, retryCsrf = true) {
   const headers = new Headers(options.headers);
+  const csrfTokenUsed = state.csrfToken;
   if (options.body && !(options.body instanceof FormData)) headers.set('content-type', 'application/json');
-  if (options.method && options.method !== 'GET' && state.csrfToken) headers.set('x-csrf-token', state.csrfToken);
+  if (options.method && options.method !== 'GET' && csrfTokenUsed) headers.set('x-csrf-token', csrfTokenUsed);
   const response = await fetch(url, { ...options, headers });
   if (response.status === 401) {
     showLogin();
@@ -31,12 +65,17 @@ async function api(url, options = {}) {
   }
   if (!response.ok) {
     const data = await response.json().catch(() => ({}));
+    if (response.status === 403 && data.code === 'CSRF_INVALID' && retryCsrf) {
+      if (state.csrfToken === csrfTokenUsed) await refreshSession();
+      return api(url, options, false);
+    }
     throw new Error(data.error || 'Không thể thực hiện thao tác.');
   }
   return response.status === 204 ? null : response.json();
 }
 
 function showLogin() {
+  stopSessionRefresh();
   appView.hidden = true;
   loginView.hidden = false;
   state.csrfToken = null;
@@ -50,6 +89,7 @@ function showApp(session) {
   $('#username-display').textContent = session.username;
   loginView.hidden = true;
   appView.hidden = false;
+  startSessionRefresh();
 }
 
 function showNotice(message, kind = 'success') {
@@ -418,6 +458,9 @@ document.addEventListener('click', (event) => {
 });
 window.addEventListener('hashchange', () => {
   if (state.csrfToken) loadFolderFromUrl();
+});
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && state.csrfToken) refreshSession().catch(() => {});
 });
 
 const session = await api('/api/session').catch(() => ({ authenticated: false }));

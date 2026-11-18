@@ -20,7 +20,8 @@ import {
   listLots,
   renameEntry,
 } from './file-service.js';
-import { createCsrfToken, verifyPassword } from './security.js';
+import { verifyPassword } from './security.js';
+import { rotateCsrfToken } from './session-token.js';
 import { buildOfficeOpenPath, createOfficeToken, isExcelFile, verifyOfficeToken } from './office-links.js';
 
 const required = ['SHARE_PATH', 'ADMIN_USER', 'ADMIN_PASSWORD_SALT', 'ADMIN_PASSWORD_HASH', 'SESSION_SECRET'];
@@ -78,7 +79,7 @@ function requireAuth(req, res, next) {
 
 function requireCsrf(req, res, next) {
   if (req.get('x-csrf-token') && req.get('x-csrf-token') === req.session.csrfToken) return next();
-  return res.status(403).json({ error: 'Phiên thao tác không hợp lệ. Hãy tải lại trang.' });
+  return res.status(403).json({ code: 'CSRF_INVALID', error: 'Phiên thao tác không hợp lệ. Đang thử làm mới.' });
 }
 
 app.get('/api/session', (req, res) => {
@@ -103,8 +104,15 @@ app.post('/api/login', loginLimiter, async (req, res) => {
   }
   await new Promise((resolve, reject) => req.session.regenerate((error) => error ? reject(error) : resolve()));
   req.session.authenticated = true;
-  req.session.csrfToken = createCsrfToken();
-  return res.json({ username, csrfToken: req.session.csrfToken });
+  const csrfToken = rotateCsrfToken(req.session);
+  return res.json({ username, csrfToken });
+});
+
+app.post('/api/session/refresh', requireAuth, (req, res) => {
+  const csrfToken = rotateCsrfToken(req.session);
+  req.session.touch();
+  res.set('Cache-Control', 'no-store');
+  return res.json({ username: process.env.ADMIN_USER, csrfToken });
 });
 
 app.post('/api/logout', requireAuth, requireCsrf, (req, res, next) => {
