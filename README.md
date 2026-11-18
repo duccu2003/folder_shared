@@ -2,6 +2,8 @@
 
 Web quản lý thư mục chia sẻ SMB với đăng nhập, liệt kê, tìm kiếm, tải lên/tải xuống, tạo thư mục, đổi tên và xóa.
 
+Mỗi thư mục có một URL riêng ở dạng `https://.../#/duong-dan-thu-muc`. Có thể sao chép URL để mở lại đúng thư mục sau khi đăng nhập, đồng thời dùng được nút Back/Forward của trình duyệt.
+
 Mục **Chọn lô** tự tìm các thư mục Job có mã `FE-IM`, `FE-EX`, `FR-IM` hoặc `FR-EX`. Ô chọn để trống ban đầu; khi chọn một lô, trang hiển thị vị trí và toàn bộ tệp trong lô, kể cả tệp nằm trong các thư mục con.
 
 Các file `.xlsx`, `.xls`, `.xlsm`, `.xlsb` và `.csv` có nút **Mở Excel**. Trên Windows có Microsoft Excel, nút này gọi Excel Desktop ở chế độ xem bằng liên kết tải có chữ ký, hết hạn sau hai phút. Portal chưa có WebDAV/WOPI để đồng bộ Save ngược như SharePoint; hãy lưu thành bản sao rồi tải lên lại nếu cần thay thế file trên server.

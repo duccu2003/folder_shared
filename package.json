@@ -7,7 +7,7 @@
     "start": "node src/server.js",
     "set-password": "node scripts/set-password.js",
     "test": "node --test",
-    "check": "node --check src/server.js && node --check src/config.js && node --check public/app.js && node --check scripts/bootstrap-config.js"
+    "check": "node --check src/server.js && node --check src/config.js && node --check public/app.js && node --check public/folder-route.js && node --check scripts/bootstrap-config.js"
   },
   "engines": {
     "node": ">=20"

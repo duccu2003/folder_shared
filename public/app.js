@@ -1,4 +1,5 @@
 import { matchesSearch } from './search.js?v=20261118-1';
+import { folderHash, pathFromHash } from './folder-route.js?v=20261118-1';
 
 const state = {
   path: '',
@@ -91,7 +92,7 @@ function renderBreadcrumbs() {
   parts.forEach((part, index) => {
     if (index) container.append(document.createTextNode(' / '));
     const link = document.createElement('a');
-    link.href = `#/${encodeURIComponent(part.path)}`;
+    link.href = folderHash(part.path);
     link.textContent = part.name;
     if (index === parts.length - 1) link.setAttribute('aria-current', 'page');
     container.append(link);
@@ -190,6 +191,20 @@ async function loadFiles(path = '') {
   } finally {
     loadingState.hidden = true;
   }
+}
+
+async function loadFolderFromUrl() {
+  if (!window.location.hash.startsWith('#/')) {
+    window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}${folderHash('')}`);
+  }
+  await loadFiles(pathFromHash(window.location.hash));
+}
+
+function navigateToFolder(path = '') {
+  const hash = folderHash(path);
+  if (window.location.hash === hash) return loadFiles(path);
+  window.location.hash = hash;
+  return undefined;
 }
 
 async function loadLots() {
@@ -305,7 +320,7 @@ loginForm.addEventListener('submit', async (event) => {
     });
     showApp(session);
     await loadLots();
-    await loadFiles('');
+    await loadFolderFromUrl();
   } catch (error) {
     errorNode.textContent = error.message;
     errorNode.hidden = false;
@@ -346,7 +361,7 @@ fileList.addEventListener('click', async (event) => {
   const control = event.target.closest('[data-action]');
   if (!control) return;
   const { action, path, name } = control.dataset;
-  if (action === 'open') return loadFiles(path);
+  if (action === 'open') return navigateToFolder(path);
   if (action === 'open-excel') {
     try { await openInExcel(path); } catch (error) { showNotice(error.message, 'error'); }
     return;
@@ -398,19 +413,15 @@ $('.lot-picker').addEventListener('keydown', (event) => {
 document.addEventListener('click', (event) => {
   if (!event.target.closest('.lot-picker')) setLotPickerOpen(false);
 });
-$('#breadcrumbs').addEventListener('click', (event) => {
-  const link = event.target.closest('a');
-  if (!link) return;
-  event.preventDefault();
-  const encoded = link.getAttribute('href').slice(2);
-  loadFiles(decodeURIComponent(encoded));
+window.addEventListener('hashchange', () => {
+  if (state.csrfToken) loadFolderFromUrl();
 });
 
 const session = await api('/api/session').catch(() => ({ authenticated: false }));
 if (session.authenticated) {
   showApp(session);
   await loadLots();
-  await loadFiles('');
+  await loadFolderFromUrl();
 } else {
   showLogin();
 }
