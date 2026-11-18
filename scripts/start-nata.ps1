@@ -7,44 +7,44 @@ function Stop-WithMessage([string]$Message) {
 }
 
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-    Stop-WithMessage 'Chưa có Node.js. Hãy cài Node.js 20 trở lên từ https://nodejs.org rồi chạy lại.'
+    Stop-WithMessage 'Node.js is missing. Install Node.js 20 or newer from https://nodejs.org and run again.'
 }
 if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
-    Stop-WithMessage 'Không tìm thấy npm. Hãy cài lại Node.js và chọn thêm Node.js vào PATH.'
+    Stop-WithMessage 'npm is missing. Reinstall Node.js and add it to PATH.'
 }
 if (-not (Get-Command ssh -ErrorAction SilentlyContinue)) {
-    Stop-WithMessage 'Không tìm thấy OpenSSH Client. Hãy bật OpenSSH Client trong Windows Optional Features.'
+    Stop-WithMessage 'OpenSSH Client is missing. Enable it in Windows Optional Features.'
 }
 
 if (-not (Test-Path -LiteralPath 'node_modules')) {
-    Write-Host 'Đang cài thư viện lần đầu...' -ForegroundColor Cyan
+    Write-Host 'Installing dependencies for the first run...' -ForegroundColor Cyan
     & npm.cmd ci
-    if ($LASTEXITCODE -ne 0) { Stop-WithMessage 'Không thể cài thư viện.' }
+    if ($LASTEXITCODE -ne 0) { Stop-WithMessage 'Dependency installation failed.' }
 }
 
 if (-not (Test-Path -LiteralPath '.env')) {
-    Write-Host "`nCẤU HÌNH LẦN ĐẦU" -ForegroundColor Green
+    Write-Host "`nFIRST-RUN SETUP" -ForegroundColor Green
     $defaultShare = '\\DESKTOP-F9CH434\Datanew\NATA'
-    $sharePath = Read-Host "Đường dẫn thư mục share [$defaultShare]"
+    $sharePath = Read-Host "Shared folder path [$defaultShare]"
     if ([string]::IsNullOrWhiteSpace($sharePath)) { $sharePath = $defaultShare }
     if (-not (Test-Path -LiteralPath $sharePath)) {
-        Stop-WithMessage "Không truy cập được $sharePath. Hãy kết nối mạng/VPN và cấp quyền thư mục trước."
+        Stop-WithMessage "Cannot access $sharePath. Connect to the correct network/VPN and grant folder access first."
     }
 
-    $username = Read-Host 'Tên đăng nhập web [admin]'
+    $username = Read-Host 'Web username [admin]'
     if ([string]::IsNullOrWhiteSpace($username)) { $username = 'admin' }
-    $passwordSecure = Read-Host 'Mật khẩu web (ít nhất 12 ký tự)' -AsSecureString
-    $confirmSecure = Read-Host 'Nhập lại mật khẩu' -AsSecureString
+    $passwordSecure = Read-Host 'Web password (at least 12 characters)' -AsSecureString
+    $confirmSecure = Read-Host 'Confirm password' -AsSecureString
     $passwordPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($passwordSecure)
     $confirmPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($confirmSecure)
     try {
         $password = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($passwordPtr)
         $confirmation = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($confirmPtr)
-        if ($password -ne $confirmation) { Stop-WithMessage 'Hai mật khẩu không giống nhau.' }
-        if ($password.Length -lt 12) { Stop-WithMessage 'Mật khẩu phải có ít nhất 12 ký tự.' }
+        if ($password -ne $confirmation) { Stop-WithMessage 'Passwords do not match.' }
+        if ($password.Length -lt 12) { Stop-WithMessage 'Password must contain at least 12 characters.' }
         $payload = @{ sharePath = $sharePath; username = $username; password = $password } | ConvertTo-Json -Compress
         $payload | & node scripts/bootstrap-config.js
-        if ($LASTEXITCODE -ne 0) { Stop-WithMessage 'Không thể tạo cấu hình.' }
+        if ($LASTEXITCODE -ne 0) { Stop-WithMessage 'Configuration creation failed.' }
     }
     finally {
         [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($passwordPtr)
@@ -55,7 +55,7 @@ if (-not (Test-Path -LiteralPath '.env')) {
     }
 }
 
-Write-Host "`nĐang khởi động NATA File Portal..." -ForegroundColor Cyan
+Write-Host "`nStarting NATA File Portal..." -ForegroundColor Cyan
 $serverLog = Join-Path $env:TEMP 'nata-file-portal.log'
 $serverErrorLog = Join-Path $env:TEMP 'nata-file-portal-error.log'
 $server = Start-Process -FilePath 'node.exe' -ArgumentList 'src/server.js' -WorkingDirectory (Get-Location) -WindowStyle Hidden -RedirectStandardOutput $serverLog -RedirectStandardError $serverErrorLog -PassThru
@@ -72,13 +72,13 @@ try {
     }
     if (-not $ready) {
         $details = @($serverLog, $serverErrorLog) | Where-Object { Test-Path -LiteralPath $_ } | ForEach-Object { Get-Content -LiteralPath $_ -Raw }
-        if (-not $details) { $details = 'Không có log.' }
-        Stop-WithMessage "Web không khởi động được.`n$details"
+        if (-not $details) { $details = 'No log is available.' }
+        Stop-WithMessage "The web server failed to start.`n$details"
     }
 
-    Write-Host 'Web nội bộ: http://127.0.0.1:8787' -ForegroundColor Green
-    Write-Host 'Đang tạo URL HTTPS công khai. Hãy sao chép URL có dạng https://...app.lhr.life' -ForegroundColor Yellow
-    Write-Host 'Giữ cửa sổ này mở để website tiếp tục hoạt động. Nhấn Ctrl+C để dừng.' -ForegroundColor Yellow
+    Write-Host 'Local website: http://127.0.0.1:8787' -ForegroundColor Green
+    Write-Host 'Creating a public HTTPS URL. Copy the URL shaped like https://...app.lhr.life' -ForegroundColor Yellow
+    Write-Host 'Keep this window open. Press Ctrl+C to stop the website.' -ForegroundColor Yellow
     Start-Process 'http://127.0.0.1:8787'
     & ssh.exe -T -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30 -R 80:127.0.0.1:8787 nokey@localhost.run
 }
