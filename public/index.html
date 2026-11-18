@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Cổng quản lý tệp NATA bảo mật">
   <title>NATA — Kho dữ liệu</title>
-  <link rel="stylesheet" href="/styles.css?v=20261118-12">
+  <link rel="stylesheet" href="/styles.css?v=20261118-13">
 </head>
 <body>
   <main id="login-view" class="login-shell" hidden>
@@ -53,9 +53,14 @@
             <div class="lot-picker">
               <label class="search-box lot-combobox" for="search-input">
                 <span class="visually-hidden">Tìm file hoặc chọn lô</span>
-                <span class="search-icon" aria-hidden="true">⌕</span>
+                <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <circle cx="10.75" cy="10.75" r="5.75"></circle>
+                  <path d="m15 15 4 4"></path>
+                </svg>
                 <input id="search-input" type="search" role="combobox" aria-controls="lot-popup" aria-expanded="false" aria-autocomplete="list" placeholder="Tìm file hoặc chọn lô…" autocomplete="off">
-                <span class="lot-chevron" aria-hidden="true">⌄</span>
+                <svg class="lot-chevron" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="m7 9.5 5 5 5-5"></path>
+                </svg>
               </label>
               <div id="lot-popup" class="lot-popup" hidden>
                 <div id="lot-options" class="lot-options" role="listbox" aria-label="Danh sách lô"></div>

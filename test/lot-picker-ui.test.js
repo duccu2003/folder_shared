@@ -23,6 +23,11 @@ test('one combobox searches files and filters the lot picker', async () => {
   assert.doesNotMatch(html, /<h1>Kho dữ liệu NATA<\/h1>/u);
   assert.match(html, /<nav id="breadcrumbs" class="breadcrumbs" aria-label="Đường dẫn thư mục"><\/nav>/u);
   assert.match(html, /Tìm file hoặc chọn lô/u);
+  assert.match(html, /<svg class="search-icon"[^>]+viewBox="0 0 24 24"/u);
+  assert.match(html, /<svg class="lot-chevron"[^>]+viewBox="0 0 24 24"/u);
+  assert.doesNotMatch(html, />⌕<|>⌄</u);
+  assert.match(css, /\.search-icon\s*\{[^}]*width:\s*1rem[^}]*height:\s*1rem/isu);
+  assert.match(css, /\.lot-chevron\s*\{[^}]*width:\s*1rem[^}]*height:\s*1rem/isu);
   assert.match(css, /\.workspace-actions\s*\{[^}]*display:\s*flex[^}]*align-items:\s*end/isu);
   assert.match(css, /\.lot-browser\s*\{[^}]*padding:\s*0[^}]*background:\s*transparent[^}]*border:\s*0/isu);
   assert.doesNotMatch(css, /\.lot-search-box/u);

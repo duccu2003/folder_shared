@@ -71,7 +71,7 @@ input:hover { border-color: #9f8170; }
 .workspace-actions { display: flex; align-items: end; gap: .75rem; width: 100%; flex-wrap: wrap; }
 .toolbar { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; flex-wrap: wrap; }
 .search-box { position: relative; display: flex; align-items: center; }
-.search-box .search-icon { position: absolute; left: .75rem; color: var(--muted); font-size: 1.15rem; pointer-events: none; }
+.search-box .search-icon { position: absolute; left: .75rem; width: 1rem; height: 1rem; color: var(--muted); fill: none; stroke: currentColor; stroke-linecap: round; stroke-width: 1.8; pointer-events: none; }
 .search-box input { width: min(17rem, 30vw); min-height: 2.5rem; padding: .55rem .75rem .55rem 2.1rem; font-size: .88rem; }
 .toolbar > button, .toolbar > .upload-button { min-height: 2.5rem; padding: .55rem .85rem; font-size: .88rem; }
 .upload-button { display: inline-flex; align-items: center; gap: .35rem; }
@@ -82,7 +82,7 @@ input:hover { border-color: #9f8170; }
 .lot-combobox { width: 100%; }
 .lot-combobox input { width: 100%; height: 2.5rem; min-height: 2.5rem; padding: .55rem 2.35rem .55rem 2.1rem; font-size: .88rem; }
 .lot-combobox input[aria-expanded="true"] { border-color: var(--brand); }
-.lot-chevron { flex: 0 0 auto; color: var(--brand); font-size: 1.1rem; transition: transform .15s ease; }
+.lot-chevron { flex: 0 0 auto; width: 1rem; height: 1rem; color: var(--brand); fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 2; transition: transform .15s ease; }
 .lot-combobox .lot-chevron { position: absolute; right: .75rem; pointer-events: none; }
 .lot-combobox:has(input[aria-expanded="true"]) .lot-chevron { transform: rotate(180deg); }
 .lot-popup { position: absolute; z-index: 20; top: calc(100% + .35rem); left: 0; width: 100%; padding: .5rem; background: white; border: 1px solid #d7b9a5; border-radius: 6px; box-shadow: 0 .75rem 2rem rgba(61, 29, 14, .16); }
