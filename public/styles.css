@@ -75,9 +75,25 @@ input:hover { border-color: #9f8170; }
 .upload-button { display: inline-flex; align-items: center; gap: .35rem; }
 .upload-button input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .lot-browser { display: flex; align-items: end; gap: 1rem; margin: -1rem 0 1rem; padding: 1rem 1.25rem; background: #fff7ed; border: 1px solid #fed7aa; border-radius: var(--radius); }
-.lot-picker { display: grid; flex: 0 1 30rem; gap: .4rem; }
-.lot-picker label, .lot-location > span { color: var(--brand-dark); font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-.lot-picker select { width: 100%; min-height: 2.9rem; padding: .65rem 2.25rem .65rem .8rem; color: var(--ink); background: white; border: 1px solid #d7b9a5; border-radius: 5px; }
+.lot-picker { position: relative; display: grid; flex: 0 1 30rem; gap: .4rem; }
+.lot-picker-label, .lot-location > span { color: var(--brand-dark); font-size: .72rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.lot-trigger { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; min-height: 2.9rem; padding: .65rem .8rem; overflow: hidden; color: var(--ink); background: white; border: 1px solid #d7b9a5; border-radius: 5px; cursor: pointer; text-align: left; }
+.lot-trigger:hover, .lot-trigger[aria-expanded="true"] { border-color: var(--brand); }
+.lot-trigger > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lot-chevron { flex: 0 0 auto; color: var(--brand); font-size: 1.1rem; transition: transform .15s ease; }
+.lot-trigger[aria-expanded="true"] .lot-chevron { transform: rotate(180deg); }
+.lot-popup { position: absolute; z-index: 20; top: calc(100% + .4rem); left: 0; width: min(34rem, calc(100vw - 3rem)); padding: .6rem; background: white; border: 1px solid #d7b9a5; border-radius: 6px; box-shadow: 0 1rem 2.5rem rgba(61, 29, 14, .18); }
+.lot-search-box { position: relative; display: flex; align-items: center; }
+.lot-search-box > span:first-child { position: absolute; left: .75rem; color: var(--muted); pointer-events: none; }
+.lot-search-box input { min-height: 2.65rem; padding-left: 2rem; }
+.lot-options { max-height: 18rem; overflow-y: auto; display: grid; gap: .15rem; margin-top: .5rem; overscroll-behavior: contain; }
+.lot-option { display: grid; grid-template-columns: 7.2rem minmax(0, 1fr); gap: .7rem; width: 100%; padding: .65rem .7rem; color: var(--ink); background: transparent; border: 0; border-radius: 4px; cursor: pointer; text-align: left; }
+.lot-option:hover, .lot-option:focus-visible { background: #fff1e6; }
+.lot-option[aria-current="true"] { color: var(--brand-dark); background: #ffeadb; }
+.lot-option strong { font-size: .84rem; }
+.lot-option span { overflow: hidden; color: var(--muted); font-size: .82rem; text-overflow: ellipsis; white-space: nowrap; }
+.lot-clear-option { grid-template-columns: 1fr; color: var(--brand-dark); font-weight: 750; }
+.lot-no-results { margin: .75rem; color: var(--muted); font-size: .84rem; text-align: center; }
 .lot-location { display: grid; min-width: 0; gap: .4rem; padding-bottom: .15rem; }
 .lot-location strong { overflow: hidden; color: var(--ink); font-size: .86rem; text-overflow: ellipsis; white-space: nowrap; }
 .file-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
@@ -118,6 +134,7 @@ dialog::backdrop { background: rgba(41, 20, 11, .55); }
   .toolbar { justify-content: flex-start; }
   .lot-browser { align-items: stretch; flex-direction: column; margin-top: 0; }
   .lot-picker { flex-basis: auto; }
+  .lot-popup { width: 100%; }
   .search-box { flex: 1 1 100%; }
   .search-box input { width: 100%; }
   th:nth-child(2), td:nth-child(2) { display: none; }

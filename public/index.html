@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Cổng quản lý tệp NATA bảo mật">
   <title>NATA — Kho dữ liệu</title>
-  <link rel="stylesheet" href="/styles.css?v=20261118-4">
+  <link rel="stylesheet" href="/styles.css?v=20261118-5">
 </head>
 <body>
   <main id="login-view" class="login-shell" hidden>
@@ -65,10 +65,20 @@
 
       <section class="lot-browser">
         <div class="lot-picker">
-          <label id="lot-browser-title" for="lot-select">Chọn lô</label>
-          <select id="lot-select">
-            <option value="">— Chọn lô —</option>
-          </select>
+          <span id="lot-browser-title" class="lot-picker-label">Chọn lô</span>
+          <button id="lot-trigger" class="lot-trigger" type="button" aria-expanded="false" aria-controls="lot-popup">
+            <span id="lot-trigger-text">— Chọn lô —</span>
+            <span class="lot-chevron" aria-hidden="true">⌄</span>
+          </button>
+          <div id="lot-popup" class="lot-popup" hidden>
+            <label class="lot-search-box" for="lot-search">
+              <span aria-hidden="true">⌕</span>
+              <span class="visually-hidden">Tìm mã hoặc tên lô</span>
+              <input id="lot-search" type="search" placeholder="Tìm mã hoặc tên lô…" autocomplete="off">
+            </label>
+            <div id="lot-options" class="lot-options" role="group" aria-label="Danh sách lô"></div>
+            <p id="lot-no-results" class="lot-no-results" hidden>Không tìm thấy lô phù hợp.</p>
+          </div>
         </div>
         <div id="lot-location" class="lot-location" hidden>
           <span>Vị trí lô</span>
@@ -107,6 +117,6 @@
       </div>
     </form>
   </dialog>
-  <script src="/app.js?v=20261118-7" type="module"></script>
+  <script src="/app.js?v=20261118-8" type="module"></script>
 </body>
 </html>

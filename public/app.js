@@ -168,9 +168,10 @@ function renderItems() {
 
 function clearLotView() {
   state.selectedLotPath = '';
-  $('#lot-select').value = '';
+  $('#lot-trigger-text').textContent = '— Chọn lô —';
   $('#lot-location').hidden = true;
   $('#file-list-title').textContent = 'Nội dung';
+  renderLotOptions();
 }
 
 async function loadFiles(path = '') {
@@ -192,14 +193,10 @@ async function loadFiles(path = '') {
 }
 
 async function loadLots() {
-  const select = $('#lot-select');
   try {
     const data = await api('/api/lots');
     state.lots = data.lots;
-    select.replaceChildren(new Option('— Chọn lô —', ''));
-    state.lots.forEach((lot) => {
-      select.add(new Option(`${lot.code} — ${lot.name}`, lot.path));
-    });
+    renderLotOptions();
   } catch (error) {
     showNotice(`Không thể tải danh sách lô: ${error.message}`, 'error');
   }
@@ -213,6 +210,7 @@ async function loadLotFiles(lotPath) {
     const data = await api(`/api/lot-files?path=${encodeURIComponent(lotPath)}`);
     state.selectedLotPath = data.lot.path;
     state.items = data.files;
+    $('#lot-trigger-text').textContent = data.lot.name;
     $('#lot-location-path').textContent = data.lot.path;
     $('#lot-location').hidden = false;
     $('#file-list-title').textContent = `Tệp trong lô ${data.lot.code}`;
@@ -222,6 +220,53 @@ async function loadLotFiles(lotPath) {
   } finally {
     loadingState.hidden = true;
   }
+}
+
+function lotDetails(lot) {
+  return lot.name.replace(new RegExp(`^${lot.code}\\s*[-—,:]*\\s*`, 'iu'), '') || 'Không có mô tả';
+}
+
+function setLotPickerOpen(open) {
+  const trigger = $('#lot-trigger');
+  trigger.setAttribute('aria-expanded', String(open));
+  $('#lot-popup').hidden = !open;
+  if (open) {
+    $('#lot-search').value = '';
+    renderLotOptions();
+    $('#lot-search').focus();
+  }
+}
+
+function createLotOption(lot) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'lot-option';
+  button.dataset.lotPath = lot.path;
+  button.setAttribute('aria-current', String(lot.path === state.selectedLotPath));
+  const code = document.createElement('strong');
+  code.textContent = lot.code;
+  const details = document.createElement('span');
+  details.textContent = lotDetails(lot);
+  button.append(code, details);
+  return button;
+}
+
+function renderLotOptions() {
+  const container = $('#lot-options');
+  if (!container) return;
+  const query = $('#lot-search').value.trim();
+  const lots = state.lots.filter((lot) => matchesSearch(`${lot.code} ${lot.name}`, query));
+  container.replaceChildren();
+  if (state.selectedLotPath && !query) {
+    const clearButton = document.createElement('button');
+    clearButton.type = 'button';
+    clearButton.className = 'lot-option lot-clear-option';
+    clearButton.dataset.lotPath = '';
+    clearButton.textContent = 'Bỏ chọn lô';
+    container.append(clearButton);
+  }
+  lots.forEach((lot) => container.append(createLotOption(lot)));
+  $('#lot-no-results').hidden = lots.length !== 0;
 }
 
 async function refreshActiveView() {
@@ -331,11 +376,27 @@ fileList.addEventListener('click', async (event) => {
 });
 
 $('#search-input').addEventListener('input', renderItems);
-$('#lot-select').addEventListener('change', async (event) => {
-  const lotPath = event.target.value;
+$('#lot-trigger').addEventListener('click', () => {
+  setLotPickerOpen($('#lot-popup').hidden);
+});
+$('#lot-search').addEventListener('input', renderLotOptions);
+$('#lot-options').addEventListener('click', async (event) => {
+  const option = event.target.closest('[data-lot-path]');
+  if (!option) return;
+  const lotPath = option.dataset.lotPath;
+  setLotPickerOpen(false);
   $('#search-input').value = '';
   if (lotPath) await loadLotFiles(lotPath);
   else await loadFiles(state.path);
+});
+$('.lot-picker').addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || $('#lot-popup').hidden) return;
+  event.preventDefault();
+  setLotPickerOpen(false);
+  $('#lot-trigger').focus();
+});
+document.addEventListener('click', (event) => {
+  if (!event.target.closest('.lot-picker')) setLotPickerOpen(false);
 });
 $('#breadcrumbs').addEventListener('click', (event) => {
   const link = event.target.closest('a');
