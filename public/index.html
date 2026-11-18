@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Cổng quản lý tệp NATA bảo mật">
   <title>NATA — Kho dữ liệu</title>
-  <link rel="stylesheet" href="/styles.css?v=20261118-11">
+  <link rel="stylesheet" href="/styles.css?v=20261118-12">
 </head>
 <body>
   <main id="login-view" class="login-shell" hidden>
@@ -51,28 +51,19 @@
         <div class="workspace-actions">
           <section class="lot-browser">
             <div class="lot-picker">
-              <span id="lot-browser-title" class="visually-hidden">Chọn lô</span>
-              <button id="lot-trigger" class="lot-trigger" type="button" aria-expanded="false" aria-controls="lot-popup">
-                <span id="lot-trigger-text">— Chọn lô —</span>
+              <label class="search-box lot-combobox" for="search-input">
+                <span class="visually-hidden">Tìm file hoặc chọn lô</span>
+                <span class="search-icon" aria-hidden="true">⌕</span>
+                <input id="search-input" type="search" role="combobox" aria-controls="lot-popup" aria-expanded="false" aria-autocomplete="list" placeholder="Tìm file hoặc chọn lô…" autocomplete="off">
                 <span class="lot-chevron" aria-hidden="true">⌄</span>
-              </button>
+              </label>
               <div id="lot-popup" class="lot-popup" hidden>
-                <label class="lot-search-box" for="lot-search">
-                  <span aria-hidden="true">⌕</span>
-                  <span class="visually-hidden">Tìm mã hoặc tên lô</span>
-                  <input id="lot-search" type="search" placeholder="Tìm mã hoặc tên lô…" autocomplete="off">
-                </label>
-                <div id="lot-options" class="lot-options" role="group" aria-label="Danh sách lô"></div>
+                <div id="lot-options" class="lot-options" role="listbox" aria-label="Danh sách lô"></div>
                 <p id="lot-no-results" class="lot-no-results" hidden>Không tìm thấy lô phù hợp.</p>
               </div>
             </div>
           </section>
           <div class="toolbar">
-            <label class="search-box">
-              <span class="visually-hidden">Tìm trong thư mục</span>
-              <span aria-hidden="true">⌕</span>
-              <input id="search-input" type="search" placeholder="Tìm trong thư mục…">
-            </label>
             <button id="new-folder-button" class="secondary-button" type="button"><span aria-hidden="true">＋</span> Thư mục mới</button>
             <label class="primary-button upload-button"><span aria-hidden="true">↑</span> Tải lên<input id="upload-input" type="file" multiple></label>
           </div>
@@ -114,6 +105,6 @@
       </div>
     </form>
   </dialog>
-  <script src="/app.js?v=20261118-11" type="module"></script>
+  <script src="/app.js?v=20261118-12" type="module"></script>
 </body>
 </html>

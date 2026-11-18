@@ -71,7 +71,7 @@ input:hover { border-color: #9f8170; }
 .workspace-actions { display: flex; align-items: end; gap: .75rem; width: 100%; flex-wrap: wrap; }
 .toolbar { display: flex; align-items: center; justify-content: flex-end; gap: .5rem; flex-wrap: wrap; }
 .search-box { position: relative; display: flex; align-items: center; }
-.search-box > span:not(.visually-hidden) { position: absolute; left: .75rem; color: var(--muted); font-size: 1.15rem; pointer-events: none; }
+.search-box .search-icon { position: absolute; left: .75rem; color: var(--muted); font-size: 1.15rem; pointer-events: none; }
 .search-box input { width: min(17rem, 30vw); min-height: 2.5rem; padding: .55rem .75rem .55rem 2.1rem; font-size: .88rem; }
 .toolbar > button, .toolbar > .upload-button { min-height: 2.5rem; padding: .55rem .85rem; font-size: .88rem; }
 .upload-button { display: inline-flex; align-items: center; gap: .35rem; }
@@ -79,16 +79,14 @@ input:hover { border-color: #9f8170; }
 .lot-browser { display: inline-flex; align-items: end; gap: 1rem; width: fit-content; max-width: 100%; margin: 0; padding: 0; background: transparent; border: 0; }
 .lot-picker { position: relative; display: grid; flex: 0 1 22rem; width: 22rem; max-width: 100%; gap: .3rem; }
 .lot-location > span { color: var(--brand-dark); font-size: .68rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-.lot-trigger { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; height: 2.5rem; padding: .5rem .7rem; overflow: hidden; color: var(--ink); background: white; border: 1px solid #d7b9a5; border-radius: 5px; cursor: pointer; font-size: .9rem; text-align: left; }
-.lot-trigger:hover, .lot-trigger[aria-expanded="true"] { border-color: var(--brand); }
-.lot-trigger > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lot-combobox { width: 100%; }
+.lot-combobox input { width: 100%; height: 2.5rem; min-height: 2.5rem; padding: .55rem 2.35rem .55rem 2.1rem; font-size: .88rem; }
+.lot-combobox input[aria-expanded="true"] { border-color: var(--brand); }
 .lot-chevron { flex: 0 0 auto; color: var(--brand); font-size: 1.1rem; transition: transform .15s ease; }
-.lot-trigger[aria-expanded="true"] .lot-chevron { transform: rotate(180deg); }
+.lot-combobox .lot-chevron { position: absolute; right: .75rem; pointer-events: none; }
+.lot-combobox:has(input[aria-expanded="true"]) .lot-chevron { transform: rotate(180deg); }
 .lot-popup { position: absolute; z-index: 20; top: calc(100% + .35rem); left: 0; width: 100%; padding: .5rem; background: white; border: 1px solid #d7b9a5; border-radius: 6px; box-shadow: 0 .75rem 2rem rgba(61, 29, 14, .16); }
-.lot-search-box { position: relative; display: flex; align-items: center; }
-.lot-search-box > span:first-child { position: absolute; left: .75rem; color: var(--muted); pointer-events: none; }
-.lot-search-box input { min-height: 2.4rem; padding: .5rem .65rem .5rem 2rem; font-size: .84rem; }
-.lot-options { max-height: 14rem; overflow-y: auto; display: grid; gap: .1rem; margin-top: .4rem; overscroll-behavior: contain; }
+.lot-options { max-height: 14rem; overflow-y: auto; display: grid; gap: .1rem; overscroll-behavior: contain; }
 .lot-option { display: grid; grid-template-columns: 6.8rem minmax(0, 1fr); gap: .55rem; width: 100%; padding: .5rem .6rem; color: var(--ink); background: transparent; border: 0; border-radius: 4px; cursor: pointer; text-align: left; }
 .lot-option:hover, .lot-option:focus-visible { background: #fff1e6; }
 .lot-option[aria-current="true"] { color: var(--brand-dark); background: #ffeadb; }

@@ -169,7 +169,7 @@ function renderItems() {
 
 function clearLotView() {
   state.selectedLotPath = '';
-  $('#lot-trigger-text').textContent = '— Chọn lô —';
+  $('#search-input').placeholder = 'Tìm file hoặc chọn lô…';
   $('#lot-location').hidden = true;
   $('#file-list-title').textContent = 'Nội dung';
   renderLotOptions();
@@ -225,7 +225,7 @@ async function loadLotFiles(lotPath) {
     const data = await api(`/api/lot-files?path=${encodeURIComponent(lotPath)}`);
     state.selectedLotPath = data.lot.path;
     state.items = data.files;
-    $('#lot-trigger-text').textContent = data.lot.name;
+    $('#search-input').placeholder = `Tìm trong lô ${data.lot.code}…`;
     $('#lot-location-path').textContent = data.lot.path;
     $('#lot-location').hidden = false;
     $('#file-list-title').textContent = `Tệp trong lô ${data.lot.code}`;
@@ -242,13 +242,11 @@ function lotDetails(lot) {
 }
 
 function setLotPickerOpen(open) {
-  const trigger = $('#lot-trigger');
-  trigger.setAttribute('aria-expanded', String(open));
+  const searchInput = $('#search-input');
+  searchInput.setAttribute('aria-expanded', String(open));
   $('#lot-popup').hidden = !open;
   if (open) {
-    $('#lot-search').value = '';
     renderLotOptions();
-    $('#lot-search').focus();
   }
 }
 
@@ -256,8 +254,10 @@ function createLotOption(lot) {
   const button = document.createElement('button');
   button.type = 'button';
   button.className = 'lot-option';
+  button.setAttribute('role', 'option');
   button.dataset.lotPath = lot.path;
   button.setAttribute('aria-current', String(lot.path === state.selectedLotPath));
+  button.setAttribute('aria-selected', String(lot.path === state.selectedLotPath));
   const code = document.createElement('strong');
   code.textContent = lot.code;
   const details = document.createElement('span');
@@ -269,13 +269,15 @@ function createLotOption(lot) {
 function renderLotOptions() {
   const container = $('#lot-options');
   if (!container) return;
-  const query = $('#lot-search').value.trim();
+  const query = $('#search-input').value.trim();
   const lots = state.lots.filter((lot) => matchesSearch(`${lot.code} ${lot.name}`, query));
   container.replaceChildren();
   if (state.selectedLotPath && !query) {
     const clearButton = document.createElement('button');
     clearButton.type = 'button';
     clearButton.className = 'lot-option lot-clear-option';
+    clearButton.setAttribute('role', 'option');
+    clearButton.setAttribute('aria-selected', 'false');
     clearButton.dataset.lotPath = '';
     clearButton.textContent = 'Bỏ chọn lô';
     container.append(clearButton);
@@ -390,11 +392,12 @@ fileList.addEventListener('click', async (event) => {
   }
 });
 
-$('#search-input').addEventListener('input', renderItems);
-$('#lot-trigger').addEventListener('click', () => {
-  setLotPickerOpen($('#lot-popup').hidden);
+$('#search-input').addEventListener('focus', () => setLotPickerOpen(true));
+$('#search-input').addEventListener('click', () => setLotPickerOpen(true));
+$('#search-input').addEventListener('input', () => {
+  renderItems();
+  setLotPickerOpen(true);
 });
-$('#lot-search').addEventListener('input', renderLotOptions);
 $('#lot-options').addEventListener('click', async (event) => {
   const option = event.target.closest('[data-lot-path]');
   if (!option) return;
@@ -408,7 +411,7 @@ $('.lot-picker').addEventListener('keydown', (event) => {
   if (event.key !== 'Escape' || $('#lot-popup').hidden) return;
   event.preventDefault();
   setLotPickerOpen(false);
-  $('#lot-trigger').focus();
+  $('#search-input').focus();
 });
 document.addEventListener('click', (event) => {
   if (!event.target.closest('.lot-picker')) setLotPickerOpen(false);
