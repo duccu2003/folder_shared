@@ -27,6 +27,10 @@ Sau đó nhấp đúp **`START-NATA.bat`**. Trong lần đầu, chương trình 
 
 Giữ cửa sổ `START-NATA.bat` mở. Đóng cửa sổ hoặc nhấn `Ctrl+C` sẽ dừng website. URL miễn phí thay đổi sau mỗi lần chạy; tên miền cố định cần một named tunnel hoặc dịch vụ hosting riêng.
 
+## Bản portable không cần cài đặt
+
+Gói portable được phát hành riêng, không lưu trên GitHub vì chứa cấu hình máy và có dung lượng lớn. Chép toàn bộ thư mục đã giải nén sang máy Windows khác rồi nhấp đúp **`RUN-NATA-PORTABLE.bat`**. Gói này đã kèm Node.js, OpenSSH, thư viện và `.env`; không cần cài Node.js, Git hay chạy lệnh thiết lập.
+
 Nếu máy khác không truy cập được đường dẫn UNC, hãy kết nối đúng mạng/VPN và đăng nhập vào share trong File Explorer trước khi chạy.
 
 ## Chạy thủ công
