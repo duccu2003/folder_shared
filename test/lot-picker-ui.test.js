@@ -18,5 +18,11 @@ test('lot picker uses a compact searchable popup instead of the native select me
   assert.match(css, /\.lot-picker\s*\{[^}]*width:\s*24rem/isu);
   assert.match(css, /\.lot-popup\s*\{[^}]*width:\s*100%/isu);
   assert.match(css, /\.lot-options\s*\{[^}]*max-height:\s*14rem/isu);
+  assert.match(html, /class="workspace-actions"/u);
+  assert.match(css, /\.workspace-actions\s*\{[^}]*justify-items:\s*start/isu);
+  assert.ok(
+    html.indexOf('class="lot-browser"') < html.indexOf('class="toolbar"'),
+    'lot picker should appear above the search toolbar',
+  );
   assert.match(app, /function\s+renderLotOptions/u);
 });
