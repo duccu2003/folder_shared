@@ -15,11 +15,13 @@ test('lot picker uses a compact searchable popup instead of the native select me
   assert.doesNotMatch(html, /<select[^>]+id="lot-select"/u);
   assert.match(css, /\.lot-options\s*\{[^}]*max-height:[^}]*overflow-y:\s*auto/isu);
   assert.match(css, /\.lot-browser\s*\{[^}]*width:\s*fit-content/isu);
-  assert.match(css, /\.lot-picker\s*\{[^}]*width:\s*24rem/isu);
+  assert.match(css, /\.lot-picker\s*\{[^}]*width:\s*22rem/isu);
   assert.match(css, /\.lot-popup\s*\{[^}]*width:\s*100%/isu);
   assert.match(css, /\.lot-options\s*\{[^}]*max-height:\s*14rem/isu);
   assert.match(html, /class="workspace-actions"/u);
-  assert.match(css, /\.workspace-actions\s*\{[^}]*justify-items:\s*start/isu);
+  assert.doesNotMatch(html, /TỆP DÙNG CHUNG/u);
+  assert.doesNotMatch(html, /<h1>Kho dữ liệu NATA<\/h1>/u);
+  assert.match(css, /\.workspace-actions\s*\{[^}]*display:\s*flex[^}]*align-items:\s*end/isu);
   assert.ok(
     html.indexOf('class="lot-browser"') < html.indexOf('class="toolbar"'),
     'lot picker should appear above the search toolbar',

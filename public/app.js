@@ -86,6 +86,7 @@ function renderBreadcrumbs() {
   const container = $('#breadcrumbs');
   container.replaceChildren();
   const segments = state.path ? state.path.split('/') : [];
+  container.hidden = segments.length === 0;
   const parts = [{ name: 'NATA', path: '' }];
   segments.forEach((name, index) => parts.push({ name, path: segments.slice(0, index + 1).join('/') }));
   parts.forEach((part, index) => {
