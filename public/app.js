@@ -69,7 +69,7 @@ function isExcelFile(name) {
 async function openInExcel(path) {
   const data = await api(`/api/office-link?path=${encodeURIComponent(path)}`);
   const fileUrl = new URL(data.url, window.location.origin).href;
-  window.location.assign(`ms-excel:ofe|u|${fileUrl}`);
+  window.location.assign(`ms-excel:ofv|u|${fileUrl}`);
   showNotice('Đang mở tệp bằng Microsoft Excel…', 'working');
 }
 
