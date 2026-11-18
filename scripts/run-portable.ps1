@@ -11,8 +11,40 @@ $node = Join-Path $root 'runtime\node.exe'
 $ssh = Join-Path $root 'runtime\openssh\ssh.exe'
 if (-not (Test-Path -LiteralPath $node)) { Stop-WithMessage 'Portable package is missing runtime\node.exe.' }
 if (-not (Test-Path -LiteralPath $ssh)) { Stop-WithMessage 'Portable package is missing runtime\openssh\ssh.exe.' }
-if (-not (Test-Path -LiteralPath '.env')) { Stop-WithMessage 'Portable package is missing .env.' }
 if (-not (Test-Path -LiteralPath 'node_modules')) { Stop-WithMessage 'Portable package is missing node_modules.' }
+
+if (-not (Test-Path -LiteralPath '.env')) {
+    Write-Host "`nFIRST-RUN SETUP" -ForegroundColor Green
+    $defaultShare = '\\DESKTOP-F9CH434\Datanew\NATA'
+    $sharePath = Read-Host "Shared folder path [$defaultShare]"
+    if ([string]::IsNullOrWhiteSpace($sharePath)) { $sharePath = $defaultShare }
+    if (-not (Test-Path -LiteralPath $sharePath)) {
+        Stop-WithMessage "Cannot access $sharePath. Check the path and folder permissions first."
+    }
+
+    $username = Read-Host 'Web username [admin]'
+    if ([string]::IsNullOrWhiteSpace($username)) { $username = 'admin' }
+    $passwordSecure = Read-Host 'Web password (at least 12 characters)' -AsSecureString
+    $confirmSecure = Read-Host 'Confirm password' -AsSecureString
+    $passwordPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($passwordSecure)
+    $confirmPtr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($confirmSecure)
+    try {
+        $password = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($passwordPtr)
+        $confirmation = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($confirmPtr)
+        if ($password -ne $confirmation) { Stop-WithMessage 'Passwords do not match.' }
+        if ($password.Length -lt 12) { Stop-WithMessage 'Password must contain at least 12 characters.' }
+        $payload = @{ sharePath = $sharePath; username = $username; password = $password } | ConvertTo-Json -Compress
+        $payload | & $node scripts/bootstrap-config.js
+        if ($LASTEXITCODE -ne 0) { Stop-WithMessage 'Configuration creation failed.' }
+    }
+    finally {
+        [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($passwordPtr)
+        [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($confirmPtr)
+        $password = $null
+        $confirmation = $null
+        $payload = $null
+    }
+}
 
 $logs = Join-Path $root 'logs'
 New-Item -ItemType Directory -Force -Path $logs | Out-Null
