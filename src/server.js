@@ -19,6 +19,7 @@ import {
   renameEntry,
 } from './file-service.js';
 import { createCsrfToken, verifyPassword } from './security.js';
+import { createOfficeToken, isExcelFile, verifyOfficeToken } from './office-links.js';
 
 const required = ['SHARE_PATH', 'ADMIN_USER', 'ADMIN_PASSWORD_SALT', 'ADMIN_PASSWORD_HASH', 'SESSION_SECRET'];
 for (const name of required) {
@@ -119,6 +120,33 @@ app.get('/api/download', requireAuth, async (req, res, next) => {
     res.download(target, path.basename(target));
   } catch (error) {
     next(error);
+  }
+});
+
+app.get('/api/office-link', requireAuth, async (req, res) => {
+  const relativePath = String(req.query.path ?? '');
+  if (!isExcelFile(relativePath)) return res.status(400).json({ error: 'Tệp này không được Excel hỗ trợ.' });
+  await getDownloadPath(shareRoot, relativePath);
+  const expires = Date.now() + 2 * 60 * 1000;
+  const token = createOfficeToken(relativePath, expires, process.env.SESSION_SECRET);
+  const params = new URLSearchParams({ path: relativePath, expires: String(expires), token });
+  res.set('Cache-Control', 'no-store');
+  return res.json({ url: `/api/office/open?${params}`, expiresAt: new Date(expires).toISOString() });
+});
+
+app.get('/api/office/open', async (req, res, next) => {
+  try {
+    const relativePath = String(req.query.path ?? '');
+    const expires = Number(req.query.expires);
+    const token = String(req.query.token ?? '');
+    if (!isExcelFile(relativePath) || !verifyOfficeToken(relativePath, expires, token, process.env.SESSION_SECRET)) {
+      return res.status(403).send('Liên kết mở Excel không hợp lệ hoặc đã hết hạn.');
+    }
+    const target = await getDownloadPath(shareRoot, relativePath);
+    res.set('Cache-Control', 'private, no-store');
+    return res.download(target, path.basename(target));
+  } catch (error) {
+    return next(error);
   }
 });
 

@@ -62,6 +62,17 @@ function formatDate(value) {
   return new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
 }
 
+function isExcelFile(name) {
+  return /\.(xlsx|xls|xlsm|xlsb|csv)$/iu.test(name);
+}
+
+async function openInExcel(path) {
+  const data = await api(`/api/office-link?path=${encodeURIComponent(path)}`);
+  const fileUrl = new URL(data.url, window.location.origin).href;
+  window.location.assign(`ms-excel:ofe|u|${fileUrl}`);
+  showNotice('Đang mở tệp bằng Microsoft Excel…', 'working');
+}
+
 function renderBreadcrumbs() {
   const container = $('#breadcrumbs');
   container.replaceChildren();
@@ -96,11 +107,12 @@ function renderItems() {
   items.forEach((item) => {
     const row = document.createElement('tr');
     const nameCell = document.createElement('td');
-    const entry = document.createElement(item.type === 'folder' ? 'button' : 'a');
+    const excelFile = item.type === 'file' && isExcelFile(item.name);
+    const entry = document.createElement(item.type === 'folder' || excelFile ? 'button' : 'a');
     entry.className = 'entry-link';
     const icon = document.createElement('span');
-    icon.className = `file-icon ${item.type}`;
-    icon.textContent = item.type === 'folder' ? '▰' : '▤';
+    icon.className = `file-icon ${excelFile ? 'excel' : item.type}`;
+    icon.textContent = item.type === 'folder' ? '▰' : excelFile ? 'X' : '▤';
     icon.setAttribute('aria-hidden', 'true');
     const text = document.createElement('span');
     text.textContent = item.name;
@@ -109,6 +121,11 @@ function renderItems() {
       entry.type = 'button';
       entry.dataset.action = 'open';
       entry.dataset.path = item.path;
+    } else if (excelFile) {
+      entry.type = 'button';
+      entry.dataset.action = 'open-excel';
+      entry.dataset.path = item.path;
+      entry.setAttribute('aria-label', `Mở ${item.name} bằng Microsoft Excel`);
     } else {
       entry.href = `/api/download?path=${encodeURIComponent(item.path)}`;
     }
@@ -119,6 +136,7 @@ function renderItems() {
     dateCell.textContent = formatDate(item.modifiedAt);
     const actionCell = document.createElement('td');
     actionCell.className = 'actions-cell';
+    if (excelFile) actionCell.append(createActionButton('Mở Excel', 'open-excel', item));
     if (item.type === 'file') actionCell.append(createActionButton('Tải xuống', 'download', item));
     actionCell.append(createActionButton('Đổi tên', 'rename', item), createActionButton('Xóa', 'delete', item));
     row.append(nameCell, sizeCell, dateCell, actionCell);
@@ -213,6 +231,10 @@ fileList.addEventListener('click', async (event) => {
   if (!control) return;
   const { action, path, name } = control.dataset;
   if (action === 'open') return loadFiles(path);
+  if (action === 'open-excel') {
+    try { await openInExcel(path); } catch (error) { showNotice(error.message, 'error'); }
+    return;
+  }
   if (action === 'download') {
     window.location.assign(`/api/download?path=${encodeURIComponent(path)}`);
     return;

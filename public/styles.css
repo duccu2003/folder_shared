@@ -92,6 +92,7 @@ th:first-child, td:first-child { width: 52%; }
 .entry-link:hover span:last-child { color: var(--brand); text-decoration: underline; }
 .file-icon { display: inline-grid; place-items: center; flex: 0 0 auto; width: 2rem; height: 2rem; color: #59635e; background: #ecefec; border-radius: 4px; }
 .file-icon.folder { color: #5f681f; background: #eef1d4; }
+.file-icon.excel { color: white; background: #217346; font-family: Arial, sans-serif; font-size: .8rem; font-weight: 800; }
 .actions-cell { width: 1%; text-align: right; }
 .row-action { padding: .35rem .45rem; color: var(--muted); background: transparent; border: 0; cursor: pointer; font-size: .77rem; }
 .row-action:hover { color: var(--brand); text-decoration: underline; }

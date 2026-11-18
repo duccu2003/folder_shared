@@ -2,6 +2,8 @@
 
 Web quản lý thư mục chia sẻ SMB với đăng nhập, liệt kê, tìm kiếm, tải lên/tải xuống, tạo thư mục, đổi tên và xóa.
 
+Các file `.xlsx`, `.xls`, `.xlsm`, `.xlsb` và `.csv` có nút **Mở Excel**. Trên Windows có Microsoft Excel, nút này gọi Excel Desktop bằng liên kết tải có chữ ký, hết hạn sau hai phút. File được mở trong Excel nhưng chưa đồng bộ Save ngược như SharePoint; hãy tải lên lại nếu cần thay thế bản trên server.
+
 ## Chạy trên một máy Windows khác
 
 Máy chạy web cần:
