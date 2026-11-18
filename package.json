@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node src/server.js",
+    "set-password": "node scripts/set-password.js",
     "test": "node --test",
     "check": "node --check src/server.js && node --check public/app.js"
   },

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Cổng quản lý tệp NATA bảo mật">
+  <title>NATA — Kho dữ liệu</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main id="login-view" class="login-shell" hidden>
+    <section class="login-panel" aria-labelledby="login-title">
+      <div class="brand-mark" aria-hidden="true">N</div>
+      <p class="eyebrow">NATA FILE PORTAL</p>
+      <h1 id="login-title">Truy cập kho dữ liệu</h1>
+      <p class="subtle">Đăng nhập để xem và quản lý tệp được chia sẻ.</p>
+      <form id="login-form" class="login-form">
+        <label for="username">Tên đăng nhập</label>
+        <input id="username" name="username" autocomplete="username" required autofocus>
+        <label for="password">Mật khẩu</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <p id="login-error" class="form-error" role="alert" hidden></p>
+        <button class="primary-button" type="submit">Đăng nhập</button>
+      </form>
+      <p class="secure-note"><span aria-hidden="true">●</span> Kết nối được mã hóa qua HTTPS</p>
+    </section>
+    <aside class="login-visual" aria-hidden="true">
+      <div class="visual-copy">
+        <span>Kho dữ liệu dùng chung</span>
+        <strong>Tập trung.<br>Gọn gàng.<br>An toàn.</strong>
+      </div>
+    </aside>
+  </main>
+
+  <main id="app-view" class="app-shell" hidden>
+    <header class="topbar">
+      <a class="brand" href="#/" aria-label="Về thư mục gốc">
+        <span class="brand-mark small" aria-hidden="true">N</span>
+        <span><strong>NATA</strong><small>Kho dữ liệu</small></span>
+      </a>
+      <div class="user-area">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span id="username-display">admin</span>
+        <button id="logout-button" class="text-button" type="button">Đăng xuất</button>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <header class="workspace-heading">
+        <div>
+          <p class="eyebrow">TỆP DÙNG CHUNG</p>
+          <h1>Kho dữ liệu NATA</h1>
+          <nav id="breadcrumbs" class="breadcrumbs" aria-label="Đường dẫn thư mục"></nav>
+        </div>
+        <div class="toolbar">
+          <label class="search-box">
+            <span class="visually-hidden">Tìm trong thư mục</span>
+            <span aria-hidden="true">⌕</span>
+            <input id="search-input" type="search" placeholder="Tìm trong thư mục…">
+          </label>
+          <button id="new-folder-button" class="secondary-button" type="button"><span aria-hidden="true">＋</span> Thư mục mới</button>
+          <label class="primary-button upload-button"><span aria-hidden="true">↑</span> Tải lên<input id="upload-input" type="file" multiple></label>
+        </div>
+      </header>
+
+      <section class="file-panel" aria-labelledby="file-list-title">
+        <div class="panel-meta">
+          <h2 id="file-list-title">Nội dung</h2>
+          <span id="item-count">0 mục</span>
+        </div>
+        <div id="notice" class="notice" role="status" hidden></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th scope="col">Tên</th><th scope="col">Kích thước</th><th scope="col">Cập nhật</th><th scope="col"><span class="visually-hidden">Thao tác</span></th></tr></thead>
+            <tbody id="file-list"></tbody>
+          </table>
+          <div id="loading-state" class="state-view" hidden>Đang tải dữ liệu…</div>
+          <div id="empty-state" class="state-view" hidden><strong>Thư mục đang trống</strong><span>Tải tệp lên hoặc tạo một thư mục mới.</span></div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <dialog id="name-dialog">
+    <form method="dialog" class="dialog-card">
+      <p class="eyebrow" id="dialog-eyebrow">THƯ MỤC</p>
+      <h2 id="dialog-title">Tạo thư mục mới</h2>
+      <label for="name-input" id="dialog-label">Tên thư mục</label>
+      <input id="name-input" required maxlength="240">
+      <p id="dialog-error" class="form-error" role="alert" hidden></p>
+      <div class="dialog-actions">
+        <button class="text-button" value="cancel" type="submit" formnovalidate>Hủy</button>
+        <button id="dialog-submit" class="primary-button" value="default" type="submit">Tạo thư mục</button>
+      </div>
+    </form>
+  </dialog>
+  <script src="/app.js" type="module"></script>
+</body>
+</html>
