@@ -136,7 +136,6 @@ function renderItems() {
     dateCell.textContent = formatDate(item.modifiedAt);
     const actionCell = document.createElement('td');
     actionCell.className = 'actions-cell';
-    if (excelFile) actionCell.append(createActionButton('Mở Excel', 'open-excel', item));
     if (item.type === 'file') actionCell.append(createActionButton('Tải xuống', 'download', item));
     actionCell.append(createActionButton('Đổi tên', 'rename', item), createActionButton('Xóa', 'delete', item));
     row.append(nameCell, sizeCell, dateCell, actionCell);
