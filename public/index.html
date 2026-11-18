@@ -63,6 +63,19 @@
         </div>
       </header>
 
+      <section class="lot-browser">
+        <div class="lot-picker">
+          <label id="lot-browser-title" for="lot-select">Chọn lô</label>
+          <select id="lot-select">
+            <option value="">— Chọn lô —</option>
+          </select>
+        </div>
+        <div id="lot-location" class="lot-location" hidden>
+          <span>Vị trí lô</span>
+          <strong id="lot-location-path"></strong>
+        </div>
+      </section>
+
       <section class="file-panel" aria-labelledby="file-list-title">
         <div class="panel-meta">
           <h2 id="file-list-title">Nội dung</h2>
@@ -94,6 +107,6 @@
       </div>
     </form>
   </dialog>
-  <script src="/app.js?v=20261118-6" type="module"></script>
+  <script src="/app.js?v=20261118-7" type="module"></script>
 </body>
 </html>

@@ -1,6 +1,13 @@
 import { matchesSearch } from './search.js?v=20261118-1';
 
-const state = { path: '', items: [], csrfToken: null, username: null };
+const state = {
+  path: '',
+  items: [],
+  lots: [],
+  selectedLotPath: '',
+  csrfToken: null,
+  username: null,
+};
 
 const $ = (selector) => document.querySelector(selector);
 const loginView = $('#login-view');
@@ -149,6 +156,9 @@ function renderItems() {
   if (query) {
     emptyTitle.textContent = 'Không tìm thấy kết quả';
     emptyHint.textContent = `Không có mục nào khớp với “${query}”.`;
+  } else if (state.selectedLotPath) {
+    emptyTitle.textContent = 'Lô chưa có tệp';
+    emptyHint.textContent = 'Không tìm thấy tệp nào trong lô này.';
   } else {
     emptyTitle.textContent = 'Thư mục đang trống';
     emptyHint.textContent = 'Tải tệp lên hoặc tạo một thư mục mới.';
@@ -156,7 +166,15 @@ function renderItems() {
   emptyState.hidden = items.length !== 0;
 }
 
+function clearLotView() {
+  state.selectedLotPath = '';
+  $('#lot-select').value = '';
+  $('#lot-location').hidden = true;
+  $('#file-list-title').textContent = 'Nội dung';
+}
+
 async function loadFiles(path = '') {
+  clearLotView();
   loadingState.hidden = false;
   emptyState.hidden = true;
   fileList.replaceChildren();
@@ -171,6 +189,48 @@ async function loadFiles(path = '') {
   } finally {
     loadingState.hidden = true;
   }
+}
+
+async function loadLots() {
+  const select = $('#lot-select');
+  try {
+    const data = await api('/api/lots');
+    state.lots = data.lots;
+    select.replaceChildren(new Option('— Chọn lô —', ''));
+    state.lots.forEach((lot) => {
+      select.add(new Option(`${lot.code} — ${lot.name}`, lot.path));
+    });
+  } catch (error) {
+    showNotice(`Không thể tải danh sách lô: ${error.message}`, 'error');
+  }
+}
+
+async function loadLotFiles(lotPath) {
+  loadingState.hidden = false;
+  emptyState.hidden = true;
+  fileList.replaceChildren();
+  try {
+    const data = await api(`/api/lot-files?path=${encodeURIComponent(lotPath)}`);
+    state.selectedLotPath = data.lot.path;
+    state.items = data.files;
+    $('#lot-location-path').textContent = data.lot.path;
+    $('#lot-location').hidden = false;
+    $('#file-list-title').textContent = `Tệp trong lô ${data.lot.code}`;
+    renderItems();
+  } catch (error) {
+    showNotice(error.message, 'error');
+  } finally {
+    loadingState.hidden = true;
+  }
+}
+
+async function refreshActiveView() {
+  if (state.selectedLotPath) return loadLotFiles(state.selectedLotPath);
+  return loadFiles(state.path);
+}
+
+function activeFolderPath() {
+  return state.selectedLotPath || state.path;
 }
 
 function askForName({ title, label, value = '', submitLabel }) {
@@ -199,6 +259,7 @@ loginForm.addEventListener('submit', async (event) => {
       body: JSON.stringify({ username: $('#username').value.trim(), password: $('#password').value }),
     });
     showApp(session);
+    await loadLots();
     await loadFiles('');
   } catch (error) {
     errorNode.textContent = error.message;
@@ -216,9 +277,9 @@ $('#new-folder-button').addEventListener('click', async () => {
   const name = await askForName({ title: 'Tạo thư mục mới', label: 'Tên thư mục', submitLabel: 'Tạo thư mục' });
   if (!name) return;
   try {
-    await api('/api/folders', { method: 'POST', body: JSON.stringify({ path: state.path, name }) });
+    await api('/api/folders', { method: 'POST', body: JSON.stringify({ path: activeFolderPath(), name }) });
     showNotice(`Đã tạo thư mục “${name}”.`);
-    await loadFiles(state.path);
+    await refreshActiveView();
   } catch (error) { showNotice(error.message, 'error'); }
 });
 
@@ -229,9 +290,9 @@ $('#upload-input').addEventListener('change', async (event) => {
   files.forEach((file) => body.append('files', file));
   showNotice(`Đang tải lên ${files.length} tệp…`, 'working');
   try {
-    await api(`/api/upload?path=${encodeURIComponent(state.path)}`, { method: 'POST', body });
+    await api(`/api/upload?path=${encodeURIComponent(activeFolderPath())}`, { method: 'POST', body });
     showNotice(`Đã tải lên ${files.length} tệp.`);
-    await loadFiles(state.path);
+    await refreshActiveView();
   } catch (error) { showNotice(error.message, 'error'); }
   event.target.value = '';
 });
@@ -250,12 +311,13 @@ fileList.addEventListener('click', async (event) => {
     return;
   }
   if (action === 'rename') {
-    const newName = await askForName({ title: 'Đổi tên', label: 'Tên mới', value: name, submitLabel: 'Lưu thay đổi' });
-    if (!newName || newName === name) return;
+    const currentName = name.split('/').at(-1);
+    const newName = await askForName({ title: 'Đổi tên', label: 'Tên mới', value: currentName, submitLabel: 'Lưu thay đổi' });
+    if (!newName || newName === currentName) return;
     try {
       await api('/api/entries', { method: 'PATCH', body: JSON.stringify({ path, name: newName }) });
       showNotice('Đã đổi tên.');
-      await loadFiles(state.path);
+      await refreshActiveView();
     } catch (error) { showNotice(error.message, 'error'); }
     return;
   }
@@ -263,12 +325,18 @@ fileList.addEventListener('click', async (event) => {
     try {
       await api('/api/entries', { method: 'DELETE', body: JSON.stringify({ path }) });
       showNotice(`Đã xóa “${name}”.`);
-      await loadFiles(state.path);
+      await refreshActiveView();
     } catch (error) { showNotice(error.message, 'error'); }
   }
 });
 
 $('#search-input').addEventListener('input', renderItems);
+$('#lot-select').addEventListener('change', async (event) => {
+  const lotPath = event.target.value;
+  $('#search-input').value = '';
+  if (lotPath) await loadLotFiles(lotPath);
+  else await loadFiles(state.path);
+});
 $('#breadcrumbs').addEventListener('click', (event) => {
   const link = event.target.closest('a');
   if (!link) return;
@@ -280,6 +348,7 @@ $('#breadcrumbs').addEventListener('click', (event) => {
 const session = await api('/api/session').catch(() => ({ authenticated: false }));
 if (session.authenticated) {
   showApp(session);
+  await loadLots();
   await loadFiles('');
 } else {
   showLogin();

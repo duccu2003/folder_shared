@@ -16,6 +16,8 @@ import {
   getDownloadPath,
   getUploadDestination,
   listDirectory,
+  listLotFiles,
+  listLots,
   renameEntry,
 } from './file-service.js';
 import { createCsrfToken, verifyPassword } from './security.js';
@@ -112,6 +114,16 @@ app.post('/api/logout', requireAuth, requireCsrf, (req, res, next) => {
 app.get('/api/files', requireAuth, async (req, res) => {
   res.set('Cache-Control', 'no-store');
   res.json(await listDirectory(shareRoot, String(req.query.path ?? '')));
+});
+
+app.get('/api/lots', requireAuth, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json({ lots: await listLots(shareRoot) });
+});
+
+app.get('/api/lot-files', requireAuth, async (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json(await listLotFiles(shareRoot, String(req.query.path ?? '')));
 });
 
 app.get('/api/download', requireAuth, async (req, res, next) => {
