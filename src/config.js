@@ -1,6 +1,11 @@
 import crypto from 'node:crypto';
 import { hashPassword } from './security.js';
 
+export function parseBootstrapInput(input) {
+  if (typeof input !== 'string') throw new Error('Configuration input must be text.');
+  return JSON.parse(input.replace(/^\uFEFF/u, '').trim());
+}
+
 export async function buildEnvFile({ sharePath, username, password }) {
   if (typeof sharePath !== 'string' || !sharePath.trim() || /[\r\n#]/u.test(sharePath)) {
     throw new Error('Đường dẫn share không hợp lệ.');
