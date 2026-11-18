@@ -22,3 +22,10 @@ export function verifyOfficeToken(relativePath, expires, token, secret, now = Da
   const actual = Buffer.from(token);
   return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
 }
+
+export function buildOfficeOpenPath(relativePath, expires, token) {
+  const filename = path.basename(relativePath);
+  if (!isExcelFile(filename)) throw new Error('Unsupported spreadsheet file');
+  const encodedPath = Buffer.from(relativePath, 'utf8').toString('base64url');
+  return `/api/office/open/${encodeURIComponent(String(expires))}/${encodeURIComponent(token)}/${encodedPath}/${encodeURIComponent(filename)}`;
+}

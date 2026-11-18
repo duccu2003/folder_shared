@@ -19,7 +19,7 @@ import {
   renameEntry,
 } from './file-service.js';
 import { createCsrfToken, verifyPassword } from './security.js';
-import { createOfficeToken, isExcelFile, verifyOfficeToken } from './office-links.js';
+import { buildOfficeOpenPath, createOfficeToken, isExcelFile, verifyOfficeToken } from './office-links.js';
 
 const required = ['SHARE_PATH', 'ADMIN_USER', 'ADMIN_PASSWORD_SALT', 'ADMIN_PASSWORD_HASH', 'SESSION_SECRET'];
 for (const name of required) {
@@ -129,22 +129,22 @@ app.get('/api/office-link', requireAuth, async (req, res) => {
   await getDownloadPath(shareRoot, relativePath);
   const expires = Date.now() + 2 * 60 * 1000;
   const token = createOfficeToken(relativePath, expires, process.env.SESSION_SECRET);
-  const params = new URLSearchParams({ path: relativePath, expires: String(expires), token });
   res.set('Cache-Control', 'no-store');
-  return res.json({ url: `/api/office/open?${params}`, expiresAt: new Date(expires).toISOString() });
+  return res.json({ url: buildOfficeOpenPath(relativePath, expires, token), expiresAt: new Date(expires).toISOString() });
 });
 
-app.get('/api/office/open', async (req, res, next) => {
+app.get('/api/office/open/:expires/:token/:encodedPath/:filename', async (req, res, next) => {
   try {
-    const relativePath = String(req.query.path ?? '');
-    const expires = Number(req.query.expires);
-    const token = String(req.query.token ?? '');
-    if (!isExcelFile(relativePath) || !verifyOfficeToken(relativePath, expires, token, process.env.SESSION_SECRET)) {
+    const relativePath = Buffer.from(req.params.encodedPath, 'base64url').toString('utf8');
+    const expires = Number(req.params.expires);
+    const token = String(req.params.token ?? '');
+    const filenameMatches = req.params.filename === path.basename(relativePath);
+    if (!filenameMatches || !isExcelFile(relativePath) || !verifyOfficeToken(relativePath, expires, token, process.env.SESSION_SECRET)) {
       return res.status(403).send('Liên kết mở Excel không hợp lệ hoặc đã hết hạn.');
     }
     const target = await getDownloadPath(shareRoot, relativePath);
     res.set('Cache-Control', 'private, no-store');
-    return res.download(target, path.basename(target));
+    return res.sendFile(target);
   } catch (error) {
     return next(error);
   }
