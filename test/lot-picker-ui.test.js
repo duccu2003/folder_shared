@@ -14,5 +14,9 @@ test('lot picker uses a compact searchable popup instead of the native select me
   assert.match(html, /id="lot-options"/u);
   assert.doesNotMatch(html, /<select[^>]+id="lot-select"/u);
   assert.match(css, /\.lot-options\s*\{[^}]*max-height:[^}]*overflow-y:\s*auto/isu);
+  assert.match(css, /\.lot-browser\s*\{[^}]*width:\s*fit-content/isu);
+  assert.match(css, /\.lot-picker\s*\{[^}]*width:\s*24rem/isu);
+  assert.match(css, /\.lot-popup\s*\{[^}]*width:\s*100%/isu);
+  assert.match(css, /\.lot-options\s*\{[^}]*max-height:\s*14rem/isu);
   assert.match(app, /function\s+renderLotOptions/u);
 });
