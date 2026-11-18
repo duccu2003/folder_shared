@@ -1,3 +1,5 @@
+import { matchesSearch } from './search.js?v=20261118-1';
+
 const state = { path: '', items: [], csrfToken: null, username: null };
 
 const $ = (selector) => document.querySelector(selector);
@@ -101,8 +103,8 @@ function createActionButton(label, action, item) {
 }
 
 function renderItems() {
-  const query = $('#search-input').value.trim().toLocaleLowerCase('vi');
-  const items = state.items.filter((item) => item.name.toLocaleLowerCase('vi').includes(query));
+  const query = $('#search-input').value.trim();
+  const items = state.items.filter((item) => matchesSearch(item.name, query));
   fileList.replaceChildren();
   items.forEach((item) => {
     const row = document.createElement('tr');
@@ -141,8 +143,17 @@ function renderItems() {
     row.append(nameCell, sizeCell, dateCell, actionCell);
     fileList.append(row);
   });
-  $('#item-count').textContent = `${items.length} mục`;
-  emptyState.hidden = items.length !== 0 || query.length > 0;
+  $('#item-count').textContent = query ? `${items.length}/${state.items.length} mục` : `${items.length} mục`;
+  const emptyTitle = emptyState.querySelector('strong');
+  const emptyHint = emptyState.querySelector('span');
+  if (query) {
+    emptyTitle.textContent = 'Không tìm thấy kết quả';
+    emptyHint.textContent = `Không có mục nào khớp với “${query}”.`;
+  } else {
+    emptyTitle.textContent = 'Thư mục đang trống';
+    emptyHint.textContent = 'Tải tệp lên hoặc tạo một thư mục mới.';
+  }
+  emptyState.hidden = items.length !== 0;
 }
 
 async function loadFiles(path = '') {
