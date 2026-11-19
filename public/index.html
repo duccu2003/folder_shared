@@ -5,15 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Cổng quản lý tệp NATA bảo mật">
   <title>NATA — Kho dữ liệu</title>
-  <link rel="stylesheet" href="/styles.css?v=20261118-13">
+  <link rel="stylesheet" href="/styles.css?v=20261119-14">
 </head>
 <body>
   <main id="login-view" class="login-shell" hidden>
     <section class="login-panel" aria-labelledby="login-title">
-      <div class="brand-mark" aria-hidden="true">N</div>
-      <p class="eyebrow">NATA FILE PORTAL</p>
-      <h1 id="login-title">Truy cập kho dữ liệu</h1>
-      <p class="subtle">Đăng nhập để xem và quản lý tệp được chia sẻ.</p>
+      <h1 id="login-title">Folder chung NATA</h1>
       <form id="login-form" class="login-form">
         <label for="username">Tên đăng nhập</label>
         <input id="username" name="username" autocomplete="username" required autofocus>
@@ -22,14 +19,7 @@
         <p id="login-error" class="form-error" role="alert" hidden></p>
         <button class="primary-button" type="submit">Đăng nhập</button>
       </form>
-      <p class="secure-note"><span aria-hidden="true">●</span> Kết nối được mã hóa qua HTTPS</p>
     </section>
-    <aside class="login-visual" aria-hidden="true">
-      <div class="visual-copy">
-        <span>Kho dữ liệu dùng chung</span>
-        <strong>Tập trung.<br>Gọn gàng.<br>An toàn.</strong>
-      </div>
-    </aside>
   </main>
 
   <main id="app-view" class="app-shell" hidden>
